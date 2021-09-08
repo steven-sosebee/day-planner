@@ -32,11 +32,9 @@
   }
   
   .row {
-    white-space: pre-wrap;
     width: 100%;
     height: 80px;
     border-top: 1px solid white;
-    position:relative;
   }
   
   .hour {
@@ -66,8 +64,6 @@
     border-bottom-right-radius: 15px;
     background-color: #06aed5;
     color: white;
-    position:absolute;
-    align-self: flex-end;
   }
   
   .saveBtn i:hover {

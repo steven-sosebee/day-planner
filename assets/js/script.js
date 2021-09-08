@@ -12,29 +12,43 @@ var meeting = {
     date: "",
     status: ""
 };
+var calendarDate =currentTime.format("DD/MMM/YYYY");
 var agenda = [];
-var startTime = moment("00:00", "HH:mm");
-var endTime = moment("24:00", "HH:mm");
+var startTime = moment("08:00", "HH:mm");
+var endTime = moment("18:00", "HH:mm");
 
 function colorCode(time) {
-    if (time < currentTime.format("HH:00")) {
+    // console.log(calendarDate);
+    // console.log(currentTime.format("DD/MMM/YYYY"));
+    if (calendarDate < currentTime.format("DD/MMM/YYYY")) {
         return "past";
+    } else if (calendarDate > currentTime.format("DD/MMM/YYYY")) {
+        return "future";
     } else {
-        if (time > currentTime.format("HH:00")) {
-            return "future";
+        if (time < currentTime.format("HH:00")) {
+            return "past";
         } else {
-            return "present";
+            if (time > currentTime.format("HH:00")) {
+                return "future";
+            } else {
+                return "present";
+            };
         };
-    }
+    };
+};
+function deleteCalendar() {
+    console.log(dayEl);
+    dayEl.html("");
 }
 function createCalendar() {
     console.log("createCalendar");
     var workingHours = moment.duration(endTime.diff(startTime)).asHours();
+    console.log(workingHours);
     for (var i = 0; i < workingHours; i++) {
-        var timeBlock = $("<li data-hour='' class='row time-block description d-flex'>");
-        var saveBtn = $("<button class='saveBtn'>");
+        var timeBlock = $("<li data-hour='' class='row time-block d-flex justify-content-between'>");
+        var saveBtn = $("<button class='saveBtn ml-auto'>");
         var timeLabel = $("<div class='hour'>");
-        var meetingLabel = $("<input class='description textarea body'>")
+        var meetingLabel = $("<input class='textarea'>")
         saveBtn.attr("id", "saveBtn-" + i);
         saveBtn.append("<i class='fas fa-lock'></i>");
         var timeColor;
@@ -83,10 +97,15 @@ function populateCalendar() {
         agenda = [];
     }
     var timeBlockEl = $("li.time-block");
+    timeBlockEl.each(function (i) {
+        $(this).children("input").val("");
+    });
     // console.log(currentDayEl.text);
     // console.log(moment("Tue September 07, 2021", "ddd MMMM DD, YYYY").format("DD/MMM/YYYY"));
-    var dateAgenda = agenda.filter(todayAgenda => { return todayAgenda.date == "07/Sep/2021" });
-    
+    var dateAgenda = agenda.filter(todayAgenda => { return todayAgenda.date == calendarDate});
+    // console.log(moment(currentDayEl.data("date"), "ddd MMMM DD, YYYY").format("DD/MMM/YYYY"));
+    // console.log(calendarDate);
+    // console.log(dateAgenda);
     // console.log(timeBlockEl);
     timeBlockEl.each(function(i){
     // for (var i = 0; i < hourEl.length; i++){
@@ -151,7 +170,8 @@ function saveMeeting(mtgTitle, mtgHour, mtgDate, mtgStatus) {
 
 function init() {
     console.log("init");
-    currentDayEl.html(currentTime.format("ddd MMMM DD, YYYY"));
+    currentDayEl.val(currentTime.format("ddd MMMM DD, YYYY"));
+    currentDayEl.attr("data-date", currentTime.format("ddd MMMM DD, YYYY"));
     createCalendar();
     rootEl.append(dayEl);
     agenda = JSON.parse(localStorage.getItem("Agenda"));
@@ -160,6 +180,16 @@ function init() {
 };
 
 init();
+// currentDayEl.on("blur", function (event) {
+//     console.log(currentDayEl);
+//     currentDayEl.attr("data-date",);
+//     var newDate = $(this).datepicker('getDate');
+//     console.log(newDate);
+//         currentDayEl.attr("data-date", newDate);
+//         currentDayEl.val(newDate);
+//         console.log("Test");
+//         populateCalendar();
+// });
 
 $(".saveBtn").on("click", function (event) {
     event.stopPropagation();
@@ -167,7 +197,26 @@ $(".saveBtn").on("click", function (event) {
     saveMeeting(
     $(event.target).closest("li").children("input").val(),
     $(event.target).closest("li").children("div").text(),
-    currentTime.format("DD/MMM/YYYY"),
+    calendarDate,
     "Pending"
     );
+});
+
+currentDayEl.datepicker({
+    dateTimeFormat: "D MM dd, yy",
+    onSelect: function () {
+        var newDate = $(this).datepicker('getDate');
+        console.log(newDate);
+        calendarDate = moment(newDate).format("DD/MMM/YYYY");
+        console.log(calendarDate);
+        currentDayEl.attr("data-date", newDate);
+        currentDayEl.val(newDate);
+        console.log("Test");
+        console.log(currentDayEl.val);
+        console.log(currentDayEl.data("date"));
+        deleteCalendar();
+        createCalendar();
+        // rootEl.append(dayEl);
+        populateCalendar();
+    }
 });
