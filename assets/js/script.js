@@ -17,10 +17,10 @@ var startTime = moment("00:00", "HH:mm");
 var endTime = moment("24:00", "HH:mm");
 
 function colorCode(time) {
-    if (time < currentTime.format("HH")) {
+    if (time < currentTime.format("HH:00")) {
         return "past";
     } else {
-        if (time > currentTime.format("HH")) {
+        if (time > currentTime.format("HH:00")) {
             return "future";
         } else {
             return "present";
@@ -31,7 +31,7 @@ function createCalendar() {
     console.log("createCalendar");
     var workingHours = moment.duration(endTime.diff(startTime)).asHours();
     for (var i = 0; i < workingHours; i++) {
-        var timeBlock = $("<li data-hour='' class='row time-block'>");
+        var timeBlock = $("<li data-hour='' class='row time-block description d-flex'>");
         var saveBtn = $("<button class='saveBtn'>");
         var timeLabel = $("<div class='hour'>");
         var meetingLabel = $("<input class='description textarea body'>")
